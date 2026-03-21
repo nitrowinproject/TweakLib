@@ -1,4 +1,6 @@
-﻿namespace TweakLib.Models.Actions
+﻿using TweakLib.Models;
+
+namespace TweakLib.Actions
 {
     public enum ServiceActionOperation
     {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
+using TweakLib.Models;
 
-namespace TweakLib.Models.Actions
+namespace TweakLib.Actions
 {
     public enum RegistryValueOperation
     {

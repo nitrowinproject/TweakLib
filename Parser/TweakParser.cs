@@ -1,4 +1,4 @@
-﻿using TweakLib.Models.Actions;
+﻿using TweakLib.Actions;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
