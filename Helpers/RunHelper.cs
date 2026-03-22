@@ -9,7 +9,8 @@ namespace TweakLib.Helpers
             var startInfo = new ProcessStartInfo()
             {
                 FileName = fileName,
-                Arguments = arguments
+                Arguments = arguments,
+                UseShellExecute = true
             };
 
             var process = Process.Start(startInfo);
