@@ -30,14 +30,14 @@ namespace TweakLib.Actions
 
         public override Task<int> ApplyAsync()
         {
+            var parts = Path.Split('\\').ToList();
+            var hive = parts[0];
+            parts.RemoveAt(0);
+
+            string subKey = string.Join("\\", parts);
+
             if (Operation == RegistryValueOperation.Delete)
             {
-                var parts = Path.Split('\\').ToList();
-                var hive = parts[0];
-                parts.RemoveAt(0);
-
-                string subKeyPath = string.Join("\\", parts);
-
                 RegistryKey baseKey = hive switch
                 {
                     "HKCU" => Registry.CurrentUser,
@@ -46,16 +46,26 @@ namespace TweakLib.Actions
                     _ => throw new NotImplementedException()
                 };
 
-                using var key = baseKey.OpenSubKey(subKeyPath, writable: true);
+                using var key = baseKey.OpenSubKey(subKey, writable: true);
                 key?.DeleteValue(Value, false);
 
                 return Task.FromResult(0);
             }
 
+            string baseName = hive switch
+            {
+                "HKCU" => "HKEY_CURRENT_USER",
+                "HKLM" => "HKEY_LOCAL_MACHINE",
+                "HKCR" => "HKEY_CLASSES_ROOT",
+                _ => throw new NotImplementedException()
+            };
+
+            string keyName = baseName + "\\" + subKey;
+
             switch (Type)
             {
                 case RegistryValueType.REG_SZ:
-                    Registry.SetValue(Path, Value, Data, (RegistryValueKind)Type);
+                    Registry.SetValue(keyName, Value, Data, (RegistryValueKind)Type);
                     break;
 
                 case RegistryValueType.REG_MULTI_SZ:
@@ -63,24 +73,24 @@ namespace TweakLib.Actions
                         ? Array.Empty<string>()
                         : Data.Split('\0');
 
-                    Registry.SetValue(Path, Value, data, (RegistryValueKind)Type);
+                    Registry.SetValue(keyName, Value, data, (RegistryValueKind)Type);
                     break;
 
                 case RegistryValueType.REG_DWORD:
-                    Registry.SetValue(Path, Value, unchecked((int)Convert.ToUInt32(Data)), (RegistryValueKind)Type);
+                    Registry.SetValue(keyName, Value, unchecked((int)Convert.ToUInt32(Data)), (RegistryValueKind)Type);
                     break;
 
                 case RegistryValueType.REG_QWORD:
-                    Registry.SetValue(Path, Value, Convert.ToUInt64(Data), (RegistryValueKind)Type);
+                    Registry.SetValue(keyName, Value, Convert.ToUInt64(Data), (RegistryValueKind)Type);
                     break;
 
                 case RegistryValueType.REG_BINARY:
                     var binary = RegistryHelper.StringToByteArray(Data);
-                    Registry.SetValue(Path, Value, binary, (RegistryValueKind)Type);
+                    Registry.SetValue(keyName, Value, binary, (RegistryValueKind)Type);
                     break;
 
                 case RegistryValueType.REG_NONE:
-                    Registry.SetValue(Path, Value, Array.Empty<byte>(), (RegistryValueKind)Type);
+                    Registry.SetValue(keyName, Value, Array.Empty<byte>(), (RegistryValueKind)Type);
                     break;
             }
 
