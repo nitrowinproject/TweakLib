@@ -65,7 +65,7 @@ namespace TweakLib.Actions
             switch (Type)
             {
                 case RegistryValueType.REG_SZ:
-                    Registry.SetValue(keyName, Value, Data, (RegistryValueKind)Type);
+                    Registry.SetValue(keyName, Value, Data ?? string.Empty, (RegistryValueKind)Type);
                     break;
 
                 case RegistryValueType.REG_MULTI_SZ:
@@ -85,7 +85,7 @@ namespace TweakLib.Actions
                     break;
 
                 case RegistryValueType.REG_BINARY:
-                    var binary = RegistryHelper.StringToByteArray(Data);
+                    var binary = RegistryHelper.StringToByteArray(Data ?? string.Empty);
                     Registry.SetValue(keyName, Value, binary, (RegistryValueKind)Type);
                     break;
 
