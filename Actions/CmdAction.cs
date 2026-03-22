@@ -7,6 +7,6 @@ namespace TweakLib.Actions
     {
         public required string Command { get; set; }
 
-        public async override Task<int> RunTask() => await RunHelper.RunApplication("cmd.exe", "/c \"" + Command + "\"");
+        public async override Task<int> RunTask() => await RunHelper.RunApplicationAsync("cmd.exe", "/c \"" + Command + "\"");
     }
 }
