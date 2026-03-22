@@ -3,9 +3,9 @@ using TweakLib.Actions;
 
 namespace TweakLib.Helpers
 {
-    public static class ServiceHelper
+    internal static class ServiceHelper
     {
-        public static async Task WaitForStatusAsync(ServiceController sc, ServiceControllerStatus desiredStatus, TimeSpan timeout)
+        internal static async Task WaitForStatusAsync(ServiceController sc, ServiceControllerStatus desiredStatus, TimeSpan timeout)
         {
             var startTime = DateTime.UtcNow;
 
@@ -19,7 +19,7 @@ namespace TweakLib.Helpers
             }
         }
 
-        public static ServiceControllerStatus GetTargetStatus(ServiceActionOperation action)
+        internal static ServiceControllerStatus GetTargetStatus(ServiceActionOperation action)
         {
             return action switch
             {

@@ -7,6 +7,6 @@ namespace TweakLib.Actions
     {
         public required string Command { get; set; }
 
-        public async override Task<int> RunTask() => await RunHelper.RunApplicationAsync("powershell.exe", $"-ExecutionPolicy Bypass -NoProfile -Command \"{Command}\"");
+        public async override Task<int> ApplyAsync() => await RunHelper.RunApplicationAsync("powershell.exe", $"-ExecutionPolicy Bypass -NoProfile -Command \"{Command}\"");
     }
 }

@@ -14,7 +14,7 @@ namespace TweakLib.Actions
         public required string Path { get; set; }
         public required ScheduledTaskActionOperation Operation { get; set; }
 
-        public override Task<int> RunTask()
+        public override Task<int> ApplyAsync()
         {
             switch (Operation)
             {

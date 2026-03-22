@@ -1,15 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+
+    <PackageId>NitroWin.TweakLib</PackageId>
+    <Title>TweakLib</Title>
+    <Authors>NitroWin</Authors>
+    <Company>NitroWin</Company>
+    <Description>A simple .NET library that powers the tweaks in NitroWin. Compatible with AME tweaks.</Description>
+    <PackageProjectUrl>https://github.com/nitrowinproject/TweakLib</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/nitrowinproject/TweakLib</RepositoryUrl>
+    <PackageLicenseExpression>0BSD</PackageLicenseExpression>
+    <PackageTags>NitroWin</PackageTags>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugSymbols>false</DebugSymbols>
+    <Deterministic>true</Deterministic>
+    <Optimize>true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.5" />
     <PackageReference Include="TaskScheduler" Version="2.12.2" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

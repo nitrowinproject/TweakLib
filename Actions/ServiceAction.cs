@@ -17,7 +17,7 @@ namespace TweakLib.Actions
         public required string Name { get; set; }
         public required ServiceActionOperation Operation { get; set; }
 
-        public async override Task<int> RunTask()
+        public async override Task<int> ApplyAsync()
         {
             using ServiceController sc = new ServiceController(Name);
             switch (Operation)

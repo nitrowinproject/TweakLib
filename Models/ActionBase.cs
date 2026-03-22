@@ -7,6 +7,6 @@ namespace TweakLib.Models
         [YamlMember(typeof(Privilege), Alias = "runas")]
         public Privilege RunAs { get; set; } = Privilege.CurrentUserElevated;
         public bool IgnoreErrors { get; set; } = false;
-        public abstract Task<int> RunTask();
+        public abstract Task<int> ApplyAsync();
     }
 }

@@ -28,7 +28,7 @@ namespace TweakLib.Actions
         public RegistryValueType Type { get; set; }
         public RegistryValueOperation Operation { get; set; } = RegistryValueOperation.Modify;
 
-        public override Task<int> RunTask()
+        public override Task<int> ApplyAsync()
         {
             if (Operation == RegistryValueOperation.Delete)
             {

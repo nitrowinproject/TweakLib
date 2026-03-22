@@ -2,9 +2,9 @@
 
 namespace TweakLib.Helpers
 {
-    public static class RunHelper
+    internal static class RunHelper
     {
-        public static async Task<int> RunApplicationAsync(string fileName, string? arguments)
+        internal static async Task<int> RunApplicationAsync(string fileName, string? arguments)
         {
             var startInfo = new ProcessStartInfo()
             {
