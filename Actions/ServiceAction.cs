@@ -9,7 +9,9 @@ namespace TweakLib.Actions
         Stop,
         Continue,
         Start,
-        Pause
+        Pause,
+        Disable,
+        Delete
     }
 
     public class ServiceAction : ActionBase
@@ -19,7 +21,16 @@ namespace TweakLib.Actions
 
         public async override Task<int> ApplyAsync()
         {
-            using ServiceController sc = new ServiceController(Name);
+            switch (Operation)
+            {
+                case ServiceActionOperation.Delete:
+                    return await RunHelper.RunApplicationAsync("sc.exe", $"delete {Name}");
+
+                case ServiceActionOperation.Disable:
+                    return await RunHelper.RunApplicationAsync("sc.exe", $"config {Name} start= disabled");
+            }
+
+            using ServiceController sc = new(Name);
             switch (Operation)
             {
                 case ServiceActionOperation.Start:
