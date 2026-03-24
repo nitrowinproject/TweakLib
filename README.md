@@ -1,13 +1,18 @@
+<div align="center">
+<img src="https://raw.githubusercontent.com/nitrowinproject/Branding/main/Assets/Images/NitroWin.png" alt="NitroWin logo" width="800">
+
 # TweakLib
 
 A simple .NET library that powers the tweaks in NitroWin. Compatible with AME tweaks.
 
-## Features
+</div>
+
+## :sparkles: Features
 
 - Compatible with AME tweaks
 - Usable outside of AME playbooks
 
-## Usage
+## :books: Usage
 
 This is how a tweak file could look:
 
@@ -41,10 +46,10 @@ foreach (var action in tweak.Actions)
 }
 ```
 
-## License
+## :scroll: License
 
 This project is licensed under the [Zero-Clause BSD License](LICENSE).
 
-### Credits
+### :bulb: Credits
 
 This project uses modified code from [trusted-uninstaller-cli](https://github.com/Ameliorated-LLC/trusted-uninstaller-cli/) by [Ameliorated-LLC](https://github.com/Ameliorated-LLC), which is licensed under the [MIT License](https://raw.githubusercontent.com/Ameliorated-LLC/trusted-uninstaller-cli/refs/heads/public/LICENSE.md).
