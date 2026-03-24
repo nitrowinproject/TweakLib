@@ -54,9 +54,11 @@ namespace TweakLib.Actions
 
             string baseName = hive switch
             {
+                "HKCR" => "HKEY_CLASSES_ROOT",
                 "HKCU" => "HKEY_CURRENT_USER",
                 "HKLM" => "HKEY_LOCAL_MACHINE",
-                "HKCR" => "HKEY_CLASSES_ROOT",
+                "HKU" => "HKEY_USERS",
+                "HKCC" => "HKEY_CURRENT_CONFIG",
                 _ => hive
             };
 
