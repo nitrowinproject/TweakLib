@@ -57,7 +57,7 @@ namespace TweakLib.Actions
                 "HKCU" => "HKEY_CURRENT_USER",
                 "HKLM" => "HKEY_LOCAL_MACHINE",
                 "HKCR" => "HKEY_CLASSES_ROOT",
-                _ => throw new NotImplementedException()
+                _ => hive
             };
 
             string keyName = baseName + "\\" + subKey;
