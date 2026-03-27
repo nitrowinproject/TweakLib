@@ -21,6 +21,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugSymbols>false</DebugSymbols>
+	  <DebugType>none</DebugType>
     <Deterministic>true</Deterministic>
     <Optimize>true</Optimize>
   </PropertyGroup>
