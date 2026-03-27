@@ -2,7 +2,6 @@
 {
     public enum Privilege
     {
-        CurrentUser,
         CurrentUserElevated,
         TrustedInstaller
     }
