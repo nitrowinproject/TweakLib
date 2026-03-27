@@ -7,6 +7,6 @@ namespace TweakLib.Actions
         public required string Exe { get; set; }
         public string? Args { get; set; }
 
-        public async override Task<int> ApplyAsync() => await RunHelper.RunApplicationAsync(Exe, Args, RunAs);
+        protected async override Task<int> ApplyAsyncCore() => await RunHelper.RunApplicationAsync(Exe, Args, RunAs);
     }
 }

@@ -1,4 +1,5 @@
-﻿using TweakLib.Models;
+﻿using TweakLib.Helpers;
+using TweakLib.Models;
 using YamlDotNet.Serialization;
 
 namespace TweakLib.Actions
@@ -8,6 +9,18 @@ namespace TweakLib.Actions
         [YamlMember(typeof(Privilege), Alias = "runas")]
         public Privilege RunAs { get; set; } = Privilege.CurrentUserElevated;
         public bool IgnoreErrors { get; set; } = false;
-        public abstract Task<int> ApplyAsync();
+        public Platforms Platforms { get; set; } = new();
+
+        public async Task<int> ApplyAsync()
+        {
+            if ((!Platforms.Mobile && PlatformHelper.IsMobile()) || (!Platforms.Desktop && !PlatformHelper.IsMobile()))
+            {
+                return 0;
+            }
+
+            return await ApplyAsyncCore();
+        }
+
+        protected abstract Task<int> ApplyAsyncCore();
     }
 }

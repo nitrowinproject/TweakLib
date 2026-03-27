@@ -20,7 +20,7 @@ namespace TweakLib.Actions
         public required string Name { get; set; }
         public required ServiceActionOperation Operation { get; set; }
 
-        public async override Task<int> ApplyAsync()
+        protected async override Task<int> ApplyAsyncCore()
         {
             switch (Operation)
             {

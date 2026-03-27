@@ -125,7 +125,7 @@ namespace TweakLib.Actions
             return TrustedInstallerHelper.RunAsTrustedInstaller("reg.exe", arguments);
         }
 
-        public override async Task<int> ApplyAsync()
+        protected override async Task<int> ApplyAsyncCore()
         {
             if (Operation == RegistryValueOperation.Delete && Type != null)
             {
