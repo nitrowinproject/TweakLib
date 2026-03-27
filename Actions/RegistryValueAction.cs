@@ -39,9 +39,11 @@ namespace TweakLib.Actions
             {
                 RegistryKey baseKey = hive switch
                 {
+                    "HKCC" or "HKEY_CURRENT_CONFIG" => Registry.CurrentConfig,
                     "HKCR" or "HKEY_CLASSES_ROOT" => Registry.ClassesRoot,
                     "HKCU" or "HKEY_CURRENT_USER" => Registry.CurrentUser,
                     "HKLM" or "HKEY_LOCAL_MACHINE" => Registry.LocalMachine,
+                    "HKU" or "HKEY_USERS" => Registry.Users,
                     _ => throw new NotImplementedException()
                 };
 
@@ -53,11 +55,11 @@ namespace TweakLib.Actions
 
             string baseName = hive switch
             {
+                "HKCC" => "HKEY_CURRENT_CONFIG",
                 "HKCR" => "HKEY_CLASSES_ROOT",
                 "HKCU" => "HKEY_CURRENT_USER",
                 "HKLM" => "HKEY_LOCAL_MACHINE",
                 "HKU" => "HKEY_USERS",
-                "HKCC" => "HKEY_CURRENT_CONFIG",
                 _ => hive
             };
 
