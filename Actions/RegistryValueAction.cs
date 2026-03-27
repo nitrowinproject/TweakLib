@@ -98,7 +98,7 @@ namespace TweakLib.Actions
 
         private void ApplyAsTrustedInstaller()
         {
-            string type = Type switch
+            string? type = Type switch
             {
                 RegistryValueType.REG_SZ => "REG_SZ",
                 RegistryValueType.REG_MULTI_SZ => "REG_MULTI_SZ",
@@ -108,7 +108,7 @@ namespace TweakLib.Actions
                 RegistryValueType.REG_NONE => throw new NotSupportedException(),
                 _ => Operation switch
                 {
-                    RegistryValueOperation.Modify => string.Empty,
+                    RegistryValueOperation.Delete => null,
                     _ => throw new NotSupportedException()
                 }
             };
