@@ -115,8 +115,8 @@ namespace TweakLib.Actions
 
             string arguments = Operation switch
             {
-                RegistryValueOperation.Modify => $"add {Path} /v {Value} /t {type} /d {Data} /f",
-                RegistryValueOperation.Delete => $"delete {Path} /f",
+                RegistryValueOperation.Modify => $"add \"{Path}\" /v \"{Value}\" /t {type} /d \"{Data}\" /f",
+                RegistryValueOperation.Delete => $"delete \"{Path}\" /f",
                 _ => throw new NotImplementedException()
             };
 
