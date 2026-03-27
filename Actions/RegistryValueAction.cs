@@ -106,7 +106,11 @@ namespace TweakLib.Actions
                 RegistryValueType.REG_QWORD => throw new NotSupportedException(),
                 RegistryValueType.REG_BINARY => "REG_BINARY",
                 RegistryValueType.REG_NONE => throw new NotSupportedException(),
-                _ => Operation != RegistryValueOperation.Delete ? string.Empty : throw new NotSupportedException()
+                _ => Operation switch
+                {
+                    RegistryValueOperation.Modify => string.Empty,
+                    _ => throw new NotSupportedException()
+                }
             };
 
             string arguments = Operation switch
