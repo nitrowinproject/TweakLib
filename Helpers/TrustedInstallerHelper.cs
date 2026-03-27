@@ -22,7 +22,14 @@ namespace TweakLib.Helpers
             while (runningTask != null && runningTask.State == TaskState.Running)
             {
                 Thread.Sleep(200);
-                runningTask.Refresh();
+                try
+                {
+                    runningTask.Refresh();
+                }
+                catch
+                {
+                    break;
+                }
             }
 
             var result = task.LastTaskResult;
