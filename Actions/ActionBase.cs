@@ -1,6 +1,7 @@
-﻿using YamlDotNet.Serialization;
+﻿using TweakLib.Models;
+using YamlDotNet.Serialization;
 
-namespace TweakLib.Models
+namespace TweakLib.Actions
 {
     public abstract class ActionBase
     {

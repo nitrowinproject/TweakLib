@@ -1,4 +1,6 @@
-﻿namespace TweakLib.Models
+﻿using TweakLib.Actions;
+
+namespace TweakLib.Models
 {
     public class Tweak
     {
