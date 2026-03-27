@@ -19,18 +19,22 @@ namespace TweakLib.Helpers
 
             RunningTask runningTask = task.RunEx(TaskRunFlags.NoFlags, 0, @"NT SERVICE\TrustedInstaller");
 
-            while (runningTask != null && runningTask.State == TaskState.Running)
+            try
             {
-                Thread.Sleep(200);
-                try
+                while (runningTask != null && runningTask.State == TaskState.Running)
                 {
-                    runningTask.Refresh();
-                }
-                catch
-                {
-                    break;
+                    Thread.Sleep(200);
+                    try
+                    {
+                        runningTask.Refresh();
+                    }
+                    catch
+                    {
+                        break;
+                    }
                 }
             }
+            catch { }
 
             var result = task.LastTaskResult;
 
