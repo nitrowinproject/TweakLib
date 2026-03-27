@@ -147,7 +147,7 @@ namespace TweakLib.Helpers
         private const uint TOKEN_ALL_ACCESS = 0xF01FF;
         private const uint TOKEN_DUPLICATE = 0x0002;
         private const uint TOKEN_QUERY = 0x0008;
-        private const uint PROCESS_QUERY_INFO = 0x0400;
+        private const uint PROCESS_ALL_ACCESS = 0x1F0FFF;
         private const uint SC_MANAGER_ALL_ACCESS = 0xF003F;
         private const uint SERVICE_ALL_ACCESS = 0xF01FF;
         private const uint SERVICE_RUNNING = 0x00000004;
@@ -164,7 +164,7 @@ namespace TweakLib.Helpers
 
             uint tiPid = StartTrustedInstallerService();
 
-            IntPtr tiProcess = OpenProcess(PROCESS_QUERY_INFO, false, tiPid);
+            IntPtr tiProcess = OpenProcess(PROCESS_ALL_ACCESS, false, tiPid);
             if (tiProcess == IntPtr.Zero)
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
