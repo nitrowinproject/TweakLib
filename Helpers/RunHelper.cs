@@ -26,7 +26,8 @@ namespace TweakLib.Helpers
             }
             else
             {
-                return (int)TrustedInstallerHelper.RunAsTrustedInstaller(fileName, arguments);
+                TrustedInstallerHelper.RunAsTrustedInstaller(fileName, arguments);
+                return 0;
             }
         }
     }

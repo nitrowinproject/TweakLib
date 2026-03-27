@@ -6,289 +6,131 @@ namespace TweakLib.Helpers
 {
     public static class TrustedInstallerHelper
     {
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr OpenProcess(uint access, bool inherit, int pid);
+
         [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern bool OpenProcessToken(
-            IntPtr processHandle,
-            uint desiredAccess,
-            out IntPtr tokenHandle);
+        private static extern bool OpenProcessToken(IntPtr process, uint access, out IntPtr token);
 
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool DuplicateTokenEx(
-            IntPtr existingTokenHandle,
-            uint desiredAccess,
+            IntPtr existingToken,
+            uint access,
             IntPtr tokenAttributes,
             int impersonationLevel,
             int tokenType,
-            out IntPtr duplicateTokenHandle);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern bool CreateProcessWithTokenW(
-            IntPtr hToken,
-            uint dwLogonFlags,
-            string lpApplicationName,
-            string lpCommandLine,
-            uint dwCreationFlags,
-            IntPtr lpEnvironment,
-            string lpCurrentDirectory,
-            ref STARTUPINFO lpStartupInfo,
-            out PROCESS_INFORMATION lpProcessInformation);
+            out IntPtr newToken);
 
         [DllImport("advapi32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool LookupPrivilegeValue(
-            string lpSystemName,
-            string lpName,
-            ref LUID lpLuid);
+        private static extern bool CreateProcessAsUser(
+            IntPtr token,
+            string app,
+            string cmdLine,
+            IntPtr procAttr,
+            IntPtr threadAttr,
+            bool inherit,
+            uint flags,
+            IntPtr env,
+            string cwd,
+            ref STARTUPINFO si,
+            out PROCESS_INFORMATION pi);
 
-        [DllImport("advapi32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AdjustTokenPrivileges(
-            IntPtr tokenHandle,
-            [MarshalAs(UnmanagedType.Bool)] bool disableAllPrivileges,
-            ref TOKEN_PRIVILEGES newState,
-            uint bufferLength,
-            IntPtr previousState,
-            IntPtr returnLength);
+        [DllImport("kernel32.dll")]
+        private static extern bool CloseHandle(IntPtr h);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool CloseHandle(IntPtr hObject);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern IntPtr OpenSCManager(
-            string machineName,
-            string databaseName,
-            uint dwAccess);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern IntPtr OpenService(
-            IntPtr hSCManager,
-            string lpServiceName,
-            uint dwDesiredAccess);
-
-        [DllImport("advapi32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool StartService(
-            IntPtr hService,
-            uint dwNumServiceArgs,
-            string[] lpServiceArgVectors);
-
-        [DllImport("advapi32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool QueryServiceStatus(
-            IntPtr hService,
-            ref SERVICE_STATUS lpServiceStatus);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr OpenProcess(
-            uint processAccess,
-            bool bInheritHandle,
-            uint processId);
-
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct STARTUPINFO
-        {
-            public uint cb;
-            public string lpReserved;
-            public string lpDesktop;
-            public string lpTitle;
-            public uint dwX, dwY, dwXSize, dwYSize;
-            public uint dwXCountChars, dwYCountChars;
-            public uint dwFillAttribute;
-            public uint dwFlags;
-            public ushort wShowWindow;
-            public ushort cbReserved2;
-            public IntPtr lpReserved2;
-            public IntPtr hStdInput, hStdOutput, hStdError;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct PROCESS_INFORMATION
-        {
-            public IntPtr hProcess;
-            public IntPtr hThread;
-            public uint dwProcessId;
-            public uint dwThreadId;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct LUID
-        {
-            public uint LowPart;
-            public int HighPart;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct LUID_AND_ATTRIBUTES
-        {
-            public LUID Luid;
-            public uint Attributes;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct TOKEN_PRIVILEGES
-        {
-            public uint PrivilegeCount;
-            public LUID_AND_ATTRIBUTES Privileges;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct SERVICE_STATUS
-        {
-            public uint dwServiceType;
-            public uint dwCurrentState;
-            public uint dwControlsAccepted;
-            public uint dwWin32ExitCode;
-            public uint dwServiceSpecificExitCode;
-            public uint dwCheckPoint;
-            public uint dwWaitHint;
-        }
-
-        private const uint TOKEN_ALL_ACCESS = 0xF01FF;
+        private const uint PROCESS_QUERY_INFORMATION = 0x0400;
         private const uint TOKEN_DUPLICATE = 0x0002;
         private const uint TOKEN_QUERY = 0x0008;
-        private const uint PROCESS_ALL_ACCESS = 0x1F0FFF;
-        private const uint SC_MANAGER_ALL_ACCESS = 0xF003F;
-        private const uint SERVICE_ALL_ACCESS = 0xF01FF;
-        private const uint SERVICE_RUNNING = 0x00000004;
-        private const uint SE_PRIVILEGE_ENABLED = 0x00000002;
-        private const string SE_DEBUG_NAME = "SeDebugPrivilege";
+        private const uint TOKEN_ALL_ACCESS = 0xF01FF;
 
         private const int SecurityImpersonation = 2;
         private const int TokenPrimary = 1;
 
-
-        public static uint RunAsTrustedInstaller(string executablePath, string? arguments = "")
+        public static void RunAsTrustedInstaller(string exe, string? arguments)
         {
-            EnableDebugPrivilege();
+            var winlogon = Process.GetProcessesByName("winlogon")[0];
+            IntPtr hProc = OpenProcess(PROCESS_QUERY_INFORMATION, false, winlogon.Id);
 
-            uint tiPid = StartTrustedInstallerService();
-
-            IntPtr tiProcess = OpenProcess(PROCESS_ALL_ACCESS, false, tiPid);
-            if (tiProcess == IntPtr.Zero)
+            if (!OpenProcessToken(hProc, TOKEN_DUPLICATE | TOKEN_QUERY, out IntPtr sysToken))
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            try
+            if (!DuplicateTokenEx(sysToken, TOKEN_ALL_ACCESS, IntPtr.Zero, SecurityImpersonation, TokenPrimary, out IntPtr sysDup))
             {
-                if (!OpenProcessToken(tiProcess, TOKEN_DUPLICATE | TOKEN_QUERY, out IntPtr tiToken))
-                {
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
-
-                try
-                {
-                    if (!DuplicateTokenEx(tiToken, TOKEN_ALL_ACCESS, IntPtr.Zero, SecurityImpersonation, TokenPrimary, out IntPtr dupToken))
-                    {
-                        throw new Win32Exception(Marshal.GetLastWin32Error());
-                    }
-
-                    try
-                    {
-                        var si = new STARTUPINFO { cb = (uint)Marshal.SizeOf<STARTUPINFO>() };
-                        string cmdLine = string.IsNullOrEmpty(arguments) ? null : $"\"{executablePath}\" {arguments}";
-
-                        if (!CreateProcessWithTokenW(dupToken, 0, executablePath, cmdLine, 0, IntPtr.Zero, null, ref si, out PROCESS_INFORMATION pi))
-                        {
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
-                        }
-
-                        CloseHandle(pi.hThread);
-                        CloseHandle(pi.hProcess);
-
-                        return pi.dwProcessId;
-                    }
-                    finally { CloseHandle(dupToken); }
-                }
-                finally { CloseHandle(tiToken); }
+                throw new Win32Exception(Marshal.GetLastWin32Error());
             }
-            finally { CloseHandle(tiProcess); }
+
+            CloseHandle(sysToken);
+            CloseHandle(hProc);
+
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "sc",
+                Arguments = "start TrustedInstaller",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            })?.WaitForExit();
+
+            Process tiProc = null;
+            foreach (var p in Process.GetProcessesByName("TrustedInstaller"))
+            {
+                tiProc = p;
+                break;
+            }
+
+            if (tiProc == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            IntPtr hTi = OpenProcess(PROCESS_QUERY_INFORMATION, false, tiProc.Id);
+
+            if (!OpenProcessToken(hTi, TOKEN_DUPLICATE | TOKEN_QUERY, out IntPtr tiToken))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
+            if (!DuplicateTokenEx(tiToken, TOKEN_ALL_ACCESS, IntPtr.Zero,
+                SecurityImpersonation, TokenPrimary, out IntPtr tiDup))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
+            CloseHandle(tiToken);
+            CloseHandle(hTi);
+
+            STARTUPINFO si = new STARTUPINFO();
+            si.cb = Marshal.SizeOf(si);
+
+            string cmdLine = string.IsNullOrEmpty(arguments) ? $"\"{exe}\"" : $"\"{exe}\" {arguments}";
+
+            if (!CreateProcessAsUser(tiDup, null, cmdLine, IntPtr.Zero, IntPtr.Zero, false, 0, IntPtr.Zero, null, ref si, out PROCESS_INFORMATION pi))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
+            CloseHandle(pi.hProcess);
+            CloseHandle(pi.hThread);
+            CloseHandle(tiDup);
         }
 
-
-        private static void EnableDebugPrivilege()
+        private struct STARTUPINFO
         {
-            if (!OpenProcessToken(Process.GetCurrentProcess().Handle, 0x0020 | TOKEN_QUERY, out IntPtr token))
-            {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
-
-            try
-            {
-                var tp = new TOKEN_PRIVILEGES { PrivilegeCount = 1 };
-                if (!LookupPrivilegeValue(null, SE_DEBUG_NAME, ref tp.Privileges.Luid))
-                {
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
-
-                tp.Privileges.Attributes = SE_PRIVILEGE_ENABLED;
-
-                if (!AdjustTokenPrivileges(token, false, ref tp, (uint)Marshal.SizeOf(tp), IntPtr.Zero, IntPtr.Zero))
-                {
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
-            }
-            finally { CloseHandle(token); }
+            public int cb;
+            public string lpReserved;
+            public string lpDesktop;
+            public string lpTitle;
+            public int dwX, dwY, dwXSize, dwYSize;
+            public int dwFlags;
         }
 
-        private static uint StartTrustedInstallerService()
+        private struct PROCESS_INFORMATION
         {
-            IntPtr scm = OpenSCManager(null, null, SC_MANAGER_ALL_ACCESS);
-            if (scm == IntPtr.Zero)
-            {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
-
-            try
-            {
-                IntPtr svc = OpenService(scm, "TrustedInstaller", SERVICE_ALL_ACCESS);
-                if (svc == IntPtr.Zero)
-                {
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
-
-                try
-                {
-                    var status = new SERVICE_STATUS();
-
-                    if (!StartService(svc, 0, null))
-                    {
-                        int err = Marshal.GetLastWin32Error();
-
-                        if (err != 1056)
-                        {
-                            throw new Win32Exception(err);
-                        }
-                    }
-
-                    for (int i = 0; i < 20; i++)
-                    {
-                        QueryServiceStatus(svc, ref status);
-
-                        if (status.dwCurrentState == SERVICE_RUNNING)
-                        {
-                            break;
-                        }
-
-                        Thread.Sleep(200);
-                    }
-
-                    if (status.dwCurrentState != SERVICE_RUNNING)
-                    {
-                        throw new InvalidOperationException();
-                    }
-
-                    foreach (var p in Process.GetProcessesByName("TrustedInstaller"))
-                    {
-                        return (uint)p.Id;
-                    }
-
-                    throw new InvalidOperationException();
-                }
-                finally { CloseHandle(svc); }
-            }
-            finally { CloseHandle(scm); }
+            public IntPtr hProcess;
+            public IntPtr hThread;
+            public int dwProcessId;
+            public int dwThreadId;
         }
     }
 }
