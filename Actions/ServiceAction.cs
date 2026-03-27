@@ -10,7 +10,9 @@ namespace TweakLib.Actions
         Start,
         Pause,
         Disable,
-        Delete
+        Delete,
+        MakeManual,
+        MakeDelayed
     }
 
     public class ServiceAction : ActionBase
@@ -27,6 +29,12 @@ namespace TweakLib.Actions
 
                 case ServiceActionOperation.Disable:
                     return await RunHelper.RunApplicationAsync("sc.exe", $"config {Name} start= disabled", RunAs);
+
+                case ServiceActionOperation.MakeManual:
+                    return await RunHelper.RunApplicationAsync("sc.exe", $"config {Name} start= demand", RunAs);
+
+                case ServiceActionOperation.MakeDelayed:
+                    return await RunHelper.RunApplicationAsync("sc.exe", $"config {Name} start= delayed-auto", RunAs);
             }
 
             using ServiceController sc = new(Name);
