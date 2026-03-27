@@ -1,25 +1,33 @@
 ﻿using System.Diagnostics;
+using TweakLib.Models;
 
 namespace TweakLib.Helpers
 {
     internal static class RunHelper
     {
-        internal static async Task<int> RunApplicationAsync(string fileName, string? arguments)
+        internal static async Task<int> RunApplicationAsync(string fileName, string? arguments, Privilege privilege)
         {
-            var startInfo = new ProcessStartInfo()
+            if (privilege != Privilege.TrustedInstaller)
             {
-                FileName = fileName,
-                Arguments = arguments,
-                UseShellExecute = true
-            };
+                var startInfo = new ProcessStartInfo()
+                {
+                    FileName = fileName,
+                    Arguments = arguments,
+                    UseShellExecute = true
+                };
 
-            var process = Process.Start(startInfo);
+                var process = Process.Start(startInfo);
 
-            if (process == null) { return -1; }
+                if (process == null) { return -1; }
 
-            await process.WaitForExitAsync();
+                await process.WaitForExitAsync();
 
-            return process.ExitCode;
+                return process.ExitCode;
+            }
+            else
+            {
+                return (int)TrustedInstallerHelper.RunAsTrustedInstaller(fileName, arguments);
+            }
         }
     }
 }

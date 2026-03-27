@@ -1,6 +1,5 @@
 ﻿using System.ServiceProcess;
 using TweakLib.Helpers;
-using TweakLib.Models;
 
 namespace TweakLib.Actions
 {
@@ -24,10 +23,10 @@ namespace TweakLib.Actions
             switch (Operation)
             {
                 case ServiceActionOperation.Delete:
-                    return await RunHelper.RunApplicationAsync("sc.exe", $"delete {Name}");
+                    return await RunHelper.RunApplicationAsync("sc.exe", $"delete {Name}", RunAs);
 
                 case ServiceActionOperation.Disable:
-                    return await RunHelper.RunApplicationAsync("sc.exe", $"config {Name} start= disabled");
+                    return await RunHelper.RunApplicationAsync("sc.exe", $"config {Name} start= disabled", RunAs);
             }
 
             using ServiceController sc = new(Name);

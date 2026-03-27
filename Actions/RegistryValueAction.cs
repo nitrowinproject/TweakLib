@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using TweakLib.Helpers;
-using TweakLib.Models;
 
 namespace TweakLib.Actions
 {

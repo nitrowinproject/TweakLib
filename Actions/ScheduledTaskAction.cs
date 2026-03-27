@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32.TaskScheduler;
-using TweakLib.Models;
 
 namespace TweakLib.Actions
 {
