@@ -96,7 +96,7 @@ namespace TweakLib.Actions
             }
         }
 
-        private void ApplyAsTrustedInstaller()
+        private int ApplyAsTrustedInstaller()
         {
             string? type = Type switch
             {
@@ -120,7 +120,7 @@ namespace TweakLib.Actions
                 _ => throw new NotImplementedException()
             };
 
-            TrustedInstallerHelper.RunAsTrustedInstaller("reg.exe", arguments);
+            return TrustedInstallerHelper.RunAsTrustedInstaller("reg.exe", arguments);
         }
 
         public override async Task<int> ApplyAsync()
@@ -137,8 +137,7 @@ namespace TweakLib.Actions
                     return 0;
 
                 case Models.Privilege.TrustedInstaller:
-                    await Task.Run(ApplyAsTrustedInstaller);
-                    return 0;
+                    return await Task.Run(ApplyAsTrustedInstaller);
 
                 default:
                     throw new NotImplementedException();
