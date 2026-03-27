@@ -56,5 +56,10 @@ namespace TweakLib.Actions
             await ServiceHelper.WaitForStatusAsync(sc, ServiceHelper.GetTargetStatus(Operation), TimeSpan.FromSeconds(10));
             return 0;
         }
+
+        public ServiceAction()
+        {
+            if (RunAs == Models.Privilege.TrustedInstaller) throw new NotImplementedException();
+        }
     }
 }

@@ -36,5 +36,10 @@ namespace TweakLib.Actions
             }
             return System.Threading.Tasks.Task.FromResult(0);
         }
+
+        public ScheduledTaskAction()
+        {
+            if (RunAs == Models.Privilege.TrustedInstaller) throw new NotImplementedException();
+        }
     }
 }
