@@ -15,25 +15,21 @@ namespace TweakLib.Actions
 
         protected override Task<int> ApplyAsyncCore()
         {
+            using var ts = new TaskService();
+
+            var task = ts.GetTask(Path) ?? throw new NullReferenceException();
+
             switch (Operation)
             {
-                case ScheduledTaskActionOperation.Delete:
-                    using (var ts = new TaskService())
-                    {
-                        var task = ts.GetTask(Path);
-                        task.Definition.Settings.Enabled = false;
-                        task.RegisterChanges();
-                    }
-                    break;
                 case ScheduledTaskActionOperation.Disable:
-                    using (var ts = new TaskService())
-                    {
-                        var task = ts.GetTask(Path);
-                        ts.RootFolder.DeleteTask(Path);
-                        task.RegisterChanges();
-                    }
+                    task.Enabled = false;
+                    break;
+
+                case ScheduledTaskActionOperation.Delete:
+                    ts.RootFolder.DeleteTask(Path, false);
                     break;
             }
+
             return System.Threading.Tasks.Task.FromResult(0);
         }
 
