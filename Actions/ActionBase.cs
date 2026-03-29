@@ -10,6 +10,7 @@ namespace TweakLib.Actions
         public Privilege RunAs { get; set; } = Privilege.CurrentUserElevated;
         public bool IgnoreErrors { get; set; } = false;
         public Platforms Platforms { get; set; } = new();
+        public int Timeout { get; set; } = 30;
 
         public async Task<int> ApplyAsync()
         {
@@ -18,7 +19,7 @@ namespace TweakLib.Actions
                 return 0;
             }
 
-            return await ApplyAsyncCore();
+            return await ApplyAsyncCore().WaitAsync(TimeSpan.FromSeconds(Timeout));
         }
 
         protected abstract Task<int> ApplyAsyncCore();
